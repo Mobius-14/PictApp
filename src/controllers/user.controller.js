@@ -6,6 +6,7 @@ const User = require('../models/user')
 
 /**
  * Register user
+ * Create user
  */
 const register = async (req = request, res = response) => {
     const { userName, email, password, bio, profilePicture, birthDay } = req.body
@@ -68,6 +69,34 @@ const register = async (req = request, res = response) => {
         })
 
     } catch (error) {
+        console.log(error)
+        res.status(500).json({
+            message: "Internal server error"
+        })
+    }
+}
+
+/**
+ * Visualize the user profile
+ */
+const viewProfile = async (req = request, res = response) =>{
+    const {id} = req.params
+    try{
+        const user = await User.findById(id, {
+            attributes: {exclude: ['password', 'email', 'createAt']}
+        })
+        if (!user){
+            return res.status(400).json({ msg: "User not found"})
+        }
+        if(user.deleted){
+            return res.status(410).json({ msg: "User account has been deleted"})
+        }
+        
+        res.status(200).json({
+            data:user,
+            message: "User profile retrieved succesfully"
+        })
+    } catch(error){
         console.log(error)
         res.status(500).json({
             message: "Internal server error"

@@ -58,7 +58,7 @@ User.associate = (models) => {
     User.hasMany(models.Comment, { foreignKey: 'userId', as: 'comments' })
     User.hasMany(models.Like, { foreignKey: 'userId', as: 'likes' })
     User.hasMany(models.User, { foreignKey: 'userId', as: 'following' })
-    User.belongsTo(User, { foreignKey: 'userId', as: 'followers' })
+    User.hasMany(models.Follower, { foreignKey: 'followerId', as: 'followers' })
 }
 
 User.prototype.toJSON = function () {
