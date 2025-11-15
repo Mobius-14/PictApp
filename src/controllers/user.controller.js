@@ -77,7 +77,43 @@ const register = async (req = request, res = response) => {
 }
 
 /**
+ * Login user
+ * host:8080/api/users/login
+ */
+const login = async (req = request, res = response) =>{
+    const {email, password} = req.body
+
+    try{
+        //Check if the user exists in the system
+        const user = await User.findOne({ email })
+
+        if (!user){
+            return res.status(400).json({msg: "Invalid credentials, try again"})
+        }
+
+        //Check if password is correct
+        const validPassword = bcryptjs.compareSync(password, user.password)
+
+        if (!validPassword){
+            return res.status(400).json({msg: "Invalid credentials, try gain "})
+        }
+        
+        //Check if user is deleted
+        if (user.deleted){
+            return res.status(410).json({msg: "User account has been deleted, please contact support"})
+        }
+
+        //Generate JWT
+        const token = await generateToken(user.id)
+    }
+
+    catch{
+        
+    }
+}
+/**
  * Visualize the user profile
+ * host:8080/api/users/2
  */
 const viewProfile = async (req = request, res = response) =>{
     const {id} = req.params
@@ -105,5 +141,6 @@ const viewProfile = async (req = request, res = response) =>{
 }
 
 module.exports = {
-    register
+    register,
+    viewProfile
 }
